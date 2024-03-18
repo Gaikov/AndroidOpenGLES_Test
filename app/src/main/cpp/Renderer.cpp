@@ -34,57 +34,6 @@ for (auto& extension: extensionList) {\
 aout << std::endl;\
 }
 
-//! Color for cornflower blue. Can be sent directly to glClearColor
-#define CORNFLOWER_BLUE 100 / 255.f, 149 / 255.f, 237 / 255.f, 1
-
-// Vertex shader, you'd typically load this from assets
-static const char *vertex = R"vertex(#version 300 es
-in vec3 inPosition;
-in vec2 inUV;
-
-out vec2 fragUV;
-
-uniform mat4 uProjection;
-
-void main() {
-    fragUV = inUV;
-    gl_Position = uProjection * vec4(inPosition, 1.0);
-}
-)vertex";
-
-// Fragment shader, you'd typically load this from assets
-static const char *fragment = R"fragment(#version 300 es
-precision mediump float;
-
-in vec2 fragUV;
-
-uniform sampler2D uTexture;
-
-out vec4 outColor;
-
-void main() {
-    outColor = texture(uTexture, fragUV);
-}
-)fragment";
-
-/*!
- * Half the height of the projection matrix. This gives you a renderable area of height 4 ranging
- * from -2 to 2
- */
-static constexpr float kProjectionHalfHeight = 2.f;
-
-/*!
- * The near plane distance for the projection matrix. Since this is an orthographic projection
- * matrix, it's convenient to have negative values for sorting (and avoiding z-fighting at 0).
- */
-static constexpr float kProjectionNearPlane = -1.f;
-
-/*!
- * The far plane distance for the projection matrix. Since this is an orthographic porjection
- * matrix, it's convenient to have the far plane equidistant from 0 as the near plane.
- */
-static constexpr float kProjectionFarPlane = 1.f;
-
 Renderer::~Renderer() {
     if (display_ != EGL_NO_DISPLAY) {
         eglMakeCurrent(display_, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
@@ -114,10 +63,12 @@ void Renderer::render() {
     // order provided. But the sample EGL setup requests a 24 bit depth buffer so you could
     // configure it at the end of initRenderer
 
-    glDisable(GL_TEXTURE_2D);
-    //glBindTexture(GL_TEXTURE0, 0);
-    GLDebug::DrawQuad(-0.5, -0.5, 0.5, 0.5);
-    GLDebug::DrawQuad(10, 10, 100, 100);
+
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, _texture->getTextureID());
+    glColor4f(1, 1, 1, 1);
+    GLDebug::DrawQuad(100, 100, width_ - 200, height_ - 200);
 
     // Present the rendered image. This is an implicit glFlush.
     glFlush();
@@ -209,6 +160,8 @@ void Renderer::initRenderer() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // get some demo models into memory
+    auto assetManager = app_->activity->assetManager;
+    _texture = TextureAsset::loadAsset(assetManager, "android_robot.png");
     GLDebug::Init();
 }
 
@@ -224,11 +177,11 @@ void Renderer::updateRenderArea() {
         height_ = height;
         glViewport(0, 0, width, height);
 
-        /*mat4x4 proj;
+        mat4x4 proj;
         mat4x4_ortho(proj, 0, width_, height_, 0, -1, 1);
         glMatrixMode(GL_PROJECTION);
         glLoadMatrixf((float*)proj);
-        glMatrixMode(GL_MODELVIEW);*/
+        glMatrixMode(GL_MODELVIEW);
     }
 }
 

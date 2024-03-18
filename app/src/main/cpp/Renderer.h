@@ -56,6 +56,7 @@ private:
     EGLContext context_;
     EGLint width_;
     EGLint height_;
+    std::shared_ptr<TextureAsset> _texture;
 };
 
 #endif //ANDROIDGLINVESTIGATIONS_RENDERER_H
