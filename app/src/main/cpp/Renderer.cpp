@@ -1,15 +1,16 @@
 #include "Renderer.h"
 
 #include <game-activity/native_app_glue/android_native_app_glue.h>
-#include <GLES3/gl3.h>
 #include <memory>
 #include <vector>
 #include <android/imagedecoder.h>
+#include <GLES/gl.h>
 
 #include "AndroidOut.h"
-#include "Shader.h"
 #include "Utility.h"
 #include "TextureAsset.h"
+#include "Renderer/GLDebug.h"
+#include "Renderer/linmath.h"
 
 //! executes glGetString and outputs the result to logcat
 #define PRINT_GL_STRING(s) {aout << #s": "<< glGetString(s) << std::endl;}
@@ -106,43 +107,20 @@ void Renderer::render() {
     // changed.
     updateRenderArea();
 
-    // When the renderable area changes, the projection matrix has to also be updated. This is true
-    // even if you change from the sample orthographic projection matrix as your aspect ratio has
-    // likely changed.
-    if (shaderNeedsNewProjectionMatrix_) {
-        // a placeholder projection matrix allocated on the stack. Column-major memory layout
-        float projectionMatrix[16] = {0};
-
-        // build an orthographic projection matrix for 2d rendering
-        Utility::buildOrthographicMatrix(
-                projectionMatrix,
-                kProjectionHalfHeight,
-                float(width_) / height_,
-                kProjectionNearPlane,
-                kProjectionFarPlane);
-
-        // send the matrix to the shader
-        // Note: the shader must be active for this to work. Since we only have one shader for this
-        // demo, we can assume that it's active.
-        shader_->setProjectionMatrix(projectionMatrix);
-
-        // make sure the matrix isn't generated every frame
-        shaderNeedsNewProjectionMatrix_ = false;
-    }
-
     // clear the color buffer
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Render all the models. There's no depth testing in this sample so they're accepted in the
     // order provided. But the sample EGL setup requests a 24 bit depth buffer so you could
     // configure it at the end of initRenderer
-    if (!models_.empty()) {
-        for (const auto &model: models_) {
-            shader_->drawModel(model);
-        }
-    }
+
+    glDisable(GL_TEXTURE_2D);
+    //glBindTexture(GL_TEXTURE0, 0);
+    GLDebug::DrawQuad(-0.5, -0.5, 0.5, 0.5);
+    GLDebug::DrawQuad(10, 10, 100, 100);
 
     // Present the rendered image. This is an implicit glFlush.
+    glFlush();
     auto swapResult = eglSwapBuffers(display_, surface_);
     assert(swapResult == EGL_TRUE);
 }
@@ -201,7 +179,7 @@ void Renderer::initRenderer() {
     EGLSurface surface = eglCreateWindowSurface(display, config, app_->window, nullptr);
 
     // Create a GLES 3 context
-    EGLint contextAttribs[] = {EGL_CONTEXT_CLIENT_VERSION, 3, EGL_NONE};
+    EGLint contextAttribs[] = {EGL_CONTEXT_CLIENT_VERSION, 1, EGL_NONE};
     EGLContext context = eglCreateContext(display, config, nullptr, contextAttribs);
 
     // get some window metrics
@@ -221,23 +199,17 @@ void Renderer::initRenderer() {
     PRINT_GL_STRING(GL_VERSION);
     PRINT_GL_STRING_AS_LIST(GL_EXTENSIONS);
 
-    shader_ = std::unique_ptr<Shader>(
-            Shader::loadShader(vertex, fragment, "inPosition", "inUV", "uProjection"));
-    assert(shader_);
-
-    // Note: there's only one shader in this demo, so I'll activate it here. For a more complex game
-    // you'll want to track the active shader and activate/deactivate it as necessary
-    shader_->activate();
-
     // setup any other gl related global states
-    glClearColor(CORNFLOWER_BLUE);
+    glClearColor(0.6, 0.6, 0.6, 1);
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST);
 
     // enable alpha globally for now, you probably don't want to do this in a game
-    glEnable(GL_BLEND);
+    //glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // get some demo models into memory
-    createModels();
+    GLDebug::Init();
 }
 
 void Renderer::updateRenderArea() {
@@ -252,43 +224,14 @@ void Renderer::updateRenderArea() {
         height_ = height;
         glViewport(0, 0, width, height);
 
-        // make sure that we lazily recreate the projection matrix before we render
-        shaderNeedsNewProjectionMatrix_ = true;
+        /*mat4x4 proj;
+        mat4x4_ortho(proj, 0, width_, height_, 0, -1, 1);
+        glMatrixMode(GL_PROJECTION);
+        glLoadMatrixf((float*)proj);
+        glMatrixMode(GL_MODELVIEW);*/
     }
 }
 
-/**
- * @brief Create any demo models we want for this demo.
- */
-void Renderer::createModels() {
-    /*
-     * This is a square:
-     * 0 --- 1
-     * | \   |
-     * |  \  |
-     * |   \ |
-     * 3 --- 2
-     */
-    std::vector <Vertex> vertices = {
-            Vertex(Vector3{1, 1, 0}, Vector2{0, 0}), // 0
-            Vertex(Vector3{-1, 1, 0}, Vector2{1, 0}), // 1
-            Vertex(Vector3{-1, -1, 0}, Vector2{1, 1}), // 2
-            Vertex(Vector3{1, -1, 0}, Vector2{0, 1}) // 3
-    };
-    std::vector <Index> indices = {
-            0, 1, 2, 0, 2, 3
-    };
-
-    // loads an image and assigns it to the square.
-    //
-    // Note: there is no texture management in this sample, so if you reuse an image be careful not
-    // to load it repeatedly. Since you get a shared_ptr you can safely reuse it in many models.
-    auto assetManager = app_->activity->assetManager;
-    auto spAndroidRobotTexture = TextureAsset::loadAsset(assetManager, "android_robot.png");
-
-    // Create a model and put it in the back of the render list.
-    models_.emplace_back(vertices, indices, spAndroidRobotTexture);
-}
 
 void Renderer::handleInput() {
     // handle all queued inputs

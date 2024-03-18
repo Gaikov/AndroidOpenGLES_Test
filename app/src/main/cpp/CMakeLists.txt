@@ -11,9 +11,9 @@ add_library(andcpptest SHARED
         main.cpp
         AndroidOut.cpp
         Renderer.cpp
-        Shader.cpp
         TextureAsset.cpp
         Renderer/GLVertexBuffer.cpp
+        Renderer/GLDebug.cpp
         Utility.cpp)
 
 # Searches for a package provided by the game activity dependency
@@ -29,7 +29,6 @@ target_link_libraries(andcpptest
         # EGL and other dependent libraries required for drawing
         # and interacting with Android system
         EGL
-        GLESv3
         GLESv1_CM
         jnigraphics
         android

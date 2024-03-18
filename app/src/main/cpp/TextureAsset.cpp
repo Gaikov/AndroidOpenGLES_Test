@@ -63,7 +63,7 @@ TextureAsset::loadAsset(AAssetManager *assetManager, const std::string &assetPat
     );
 
     // generate mip levels. Not really needed for 2D, but good to do
-    glGenerateMipmap(GL_TEXTURE_2D);
+    //glGenerateMipmap(GL_TEXTURE_2D);
 
     // cleanup helpers
     AImageDecoder_delete(pAndroidDecoder);

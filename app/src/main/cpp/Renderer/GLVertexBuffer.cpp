@@ -6,7 +6,9 @@
  */
 
 #include "GLVertexBuffer.h"
+#include "../AndroidOut.h"
 #include <GLES/gl.h>
+#include <assert.h>
 
 GLVertexBuffer::GLVertexBuffer(int numVertices, int numIndexes, bool useColor) :
 	m_numVertices(numVertices),
@@ -99,5 +101,7 @@ void GLVertexBuffer::Draw(unsigned int primitivesMode)
 	}
 
 	glDrawElements(primitivesMode, m_maxDrawIndexes, GL_UNSIGNED_SHORT, m_indexes);
+    auto err = glGetError();
+    assert(err == GL_NO_ERROR);
 }
 

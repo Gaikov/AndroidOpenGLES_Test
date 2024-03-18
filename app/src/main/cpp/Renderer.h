@@ -5,7 +5,6 @@
 #include <memory>
 
 #include "Model.h"
-#include "Shader.h"
 
 struct android_app;
 
@@ -20,8 +19,7 @@ public:
             surface_(EGL_NO_SURFACE),
             context_(EGL_NO_CONTEXT),
             width_(0),
-            height_(0),
-            shaderNeedsNewProjectionMatrix_(true) {
+            height_(0) {
         initRenderer();
     }
 
@@ -52,23 +50,12 @@ private:
      */
     void updateRenderArea();
 
-    /*!
-     * Creates the models for this sample. You'd likely load a scene configuration from a file or
-     * use some other setup logic in your full game.
-     */
-    void createModels();
-
     android_app *app_;
     EGLDisplay display_;
     EGLSurface surface_;
     EGLContext context_;
     EGLint width_;
     EGLint height_;
-
-    bool shaderNeedsNewProjectionMatrix_;
-
-    std::unique_ptr <Shader> shader_;
-    std::vector <Model> models_;
 };
 
 #endif //ANDROIDGLINVESTIGATIONS_RENDERER_H
