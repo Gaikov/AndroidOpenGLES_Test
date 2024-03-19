@@ -30,8 +30,6 @@ bool Engine::Init() {
 void Engine::Update(float deltaTime) {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glEnable(GL_TEXTURE_2D);
-
     glColor4f(1, 1, 1, 1);
 
     _testRunner.Update(deltaTime);

@@ -9,9 +9,11 @@ project("andcpptest")
 # one used for loading in your Kotlin/Java or AndroidManifest.txt files.
 add_library(andcpptest SHARED
         android/main.cpp
-        android/AndroidOut.cpp
         android/Renderer.cpp
+        android/AndroidOut.cpp
         android/TextureAsset.cpp
+        android/AndroidGameApp.cpp
+        android/AndroidImagesDecoder.cpp
         engine/Engine.cpp
         functional/FunctionalTestRunner.cpp
         functional/IFunctionalTest.cpp

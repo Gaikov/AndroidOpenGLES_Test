@@ -11,6 +11,9 @@
 #include "TextureAsset.h"
 #include "../GLDebug.h"
 #include "../linmath.h"
+#include "engine/GameApp.h"
+#include "AndroidGameApp.h"
+#include "engine/Engine.h"
 
 //! executes glGetString and outputs the result to logcat
 #define PRINT_GL_STRING(s) {aout << #s": "<< glGetString(s) << std::endl;}
@@ -34,6 +37,12 @@ for (auto& extension: extensionList) {\
 aout << std::endl;\
 }
 
+AndroidGameApp *g_internalGameApp = nullptr;
+
+GameApp *GameApp::GetApp() {
+    return g_internalGameApp;
+}
+
 Renderer::~Renderer() {
     if (display_ != EGL_NO_DISPLAY) {
         eglMakeCurrent(display_, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
@@ -48,6 +57,9 @@ Renderer::~Renderer() {
         eglTerminate(display_);
         display_ = EGL_NO_DISPLAY;
     }
+
+    Engine::Release();
+    delete g_internalGameApp;
 }
 
 void Renderer::render() {
@@ -56,27 +68,14 @@ void Renderer::render() {
     // changed.
     updateRenderArea();
 
-    // clear the color buffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    Engine::Update(1/60.0f);
 
-    // Render all the models. There's no depth testing in this sample so they're accepted in the
-    // order provided. But the sample EGL setup requests a 24 bit depth buffer so you could
-    // configure it at the end of initRenderer
-
-
-
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, _texture->getTextureID());
-    glColor4f(1, 1, 1, 1);
-    GLDebug::DrawQuad(100, 100, width_ - 200, height_ - 200);
-
-    // Present the rendered image. This is an implicit glFlush.
-    glFlush();
     auto swapResult = eglSwapBuffers(display_, surface_);
     assert(swapResult == EGL_TRUE);
 }
 
 void Renderer::initRenderer() {
+    g_internalGameApp = new AndroidGameApp(app_);
     // Choose your render attributes
     constexpr
     EGLint attribs[] = {
@@ -150,19 +149,7 @@ void Renderer::initRenderer() {
     PRINT_GL_STRING(GL_VERSION);
     PRINT_GL_STRING_AS_LIST(GL_EXTENSIONS);
 
-    // setup any other gl related global states
-    glClearColor(0.6, 0.6, 0.6, 1);
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_DEPTH_TEST);
-
-    // enable alpha globally for now, you probably don't want to do this in a game
-    //glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    // get some demo models into memory
-    auto assetManager = app_->activity->assetManager;
-    _texture = TextureAsset::loadAsset(assetManager, "android_robot.png");
-    GLDebug::Init();
+    Engine::Init();
 }
 
 void Renderer::updateRenderArea() {
@@ -175,13 +162,7 @@ void Renderer::updateRenderArea() {
     if (width != width_ || height != height_) {
         width_ = width;
         height_ = height;
-        glViewport(0, 0, width, height);
-
-        mat4x4 proj;
-        mat4x4_ortho(proj, 0, width_, height_, 0, -1, 1);
-        glMatrixMode(GL_PROJECTION);
-        glLoadMatrixf((float*)proj);
-        glMatrixMode(GL_MODELVIEW);
+        Engine::OnResize(width, height);
     }
 }
 
