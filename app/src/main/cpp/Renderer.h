@@ -3,8 +3,7 @@
 
 #include <EGL/egl.h>
 #include <memory>
-
-#include "Model.h"
+#include "TextureAsset.h"
 
 struct android_app;
 

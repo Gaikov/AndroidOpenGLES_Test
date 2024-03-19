@@ -5,9 +5,9 @@
 #include <vector>
 #include <android/imagedecoder.h>
 #include <GLES/gl.h>
+#include <assert.h>
 
 #include "AndroidOut.h"
-#include "Utility.h"
 #include "TextureAsset.h"
 #include "Renderer/GLDebug.h"
 #include "Renderer/linmath.h"

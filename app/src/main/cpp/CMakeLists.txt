@@ -14,7 +14,7 @@ add_library(andcpptest SHARED
         TextureAsset.cpp
         Renderer/GLVertexBuffer.cpp
         Renderer/GLDebug.cpp
-        Utility.cpp)
+)
 
 # Searches for a package provided by the game activity dependency
 find_package(game-activity REQUIRED CONFIG)

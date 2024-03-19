@@ -1,3 +1,5 @@
+import com.android.aaptcompiler.parseOrientation
+
 plugins {
     alias(libs.plugins.androidApplication)
 }
@@ -7,7 +9,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.andcpptest"
+        applicationId = "com.grom.Azangara"
         minSdk = 30
         targetSdk = 34
         versionCode = 1
