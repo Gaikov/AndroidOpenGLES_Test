@@ -6,7 +6,7 @@
  */
 
 #include "GLVertexBuffer.h"
-#include "../AndroidOut.h"
+#include "android/AndroidOut.h"
 #include <GLES/gl.h>
 #include <assert.h>
 

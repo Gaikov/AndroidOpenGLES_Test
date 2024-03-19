@@ -9,8 +9,8 @@
 
 #include "AndroidOut.h"
 #include "TextureAsset.h"
-#include "Renderer/GLDebug.h"
-#include "Renderer/linmath.h"
+#include "../GLDebug.h"
+#include "../linmath.h"
 
 //! executes glGetString and outputs the result to logcat
 #define PRINT_GL_STRING(s) {aout << #s": "<< glGetString(s) << std::endl;}

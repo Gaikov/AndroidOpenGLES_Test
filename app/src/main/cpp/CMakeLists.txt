@@ -8,12 +8,12 @@ project("andcpptest")
 # Creates your game shared library. The name must be the same as the
 # one used for loading in your Kotlin/Java or AndroidManifest.txt files.
 add_library(andcpptest SHARED
-        main.cpp
-        AndroidOut.cpp
-        Renderer.cpp
-        TextureAsset.cpp
-        Renderer/GLVertexBuffer.cpp
-        Renderer/GLDebug.cpp
+        android/main.cpp
+        android/AndroidOut.cpp
+        android/Renderer.cpp
+        android/TextureAsset.cpp
+        GLVertexBuffer.cpp
+        GLDebug.cpp
 )
 
 # Searches for a package provided by the game activity dependency
