@@ -2,8 +2,8 @@
 // Created by Raman Haikou on 2019-07-22.
 //
 
-#include <GLES/gl.h>
 #include "GLDebug.h"
+#include "GLTexture.h"
 #include "GLVertexBuffer.h"
 
 GLVertexBuffer *GLDebug::_quadBuffer = nullptr;
@@ -33,6 +33,11 @@ void GLDebug::DrawQuad(float x, float y, float width, float height)
 	_quadBuffer->Draw(GL_TRIANGLES);
 }
 
+void GLDebug::DrawSprite(GLTexture *t, float x, float y)
+{
+	t->Bind();
+	DrawQuad(x, y, t->GetWidth(), t->GetHeight());
+}
 
 /*
  * 0    3

@@ -12,9 +12,22 @@ add_library(andcpptest SHARED
         android/AndroidOut.cpp
         android/Renderer.cpp
         android/TextureAsset.cpp
+        engine/Engine.cpp
+        functional/FunctionalTestRunner.cpp
+        functional/IFunctionalTest.cpp
+        functional/TexturesTest.cpp
+        functional/VertexColorTest.cpp
+        BitmapData.cpp
+        GLRenderer.cpp
+        GLTexture.cpp
+        GLTexturesCache.cpp
+        GLUtils.cpp
         GLVertexBuffer.cpp
         GLDebug.cpp
+        ResourcesCache.cpp
 )
+
+include_directories(./)
 
 # Searches for a package provided by the game activity dependency
 find_package(game-activity REQUIRED CONFIG)
