@@ -11,13 +11,12 @@ TexturesTest::TexturesTest() : _angle(0), t(nullptr), t2(nullptr) {
 }
 
 bool TexturesTest::Init() {
-    textures.GetResource("test.png", 0);
-    t = textures.GetResource("test.png", 0);
+    t = textures.GetResource("test.JPG", 0);
     if (!t) {
         return false;
     }
 
-    t2 = textures.GetResource("test2.png", 0);
+    t2 = textures.GetResource("test.png", 0);
     return t2 != nullptr;
 }
 

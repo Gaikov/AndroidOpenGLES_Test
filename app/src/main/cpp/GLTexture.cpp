@@ -78,6 +78,7 @@ bool GLTexture::CreateFromBitmapData(BitmapData *bmData)
 
 bool GLTexture::Bind() const
 {
+    glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, _glTexture);
 	GL_CHECK("glBindTexture")
 
